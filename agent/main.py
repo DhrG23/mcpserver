@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import json
 import os
+from pathlib import Path
 from collections.abc import Mapping
 from typing import Any
 
@@ -11,6 +12,10 @@ import httpx
 import httpx2
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
+from dotenv import load_dotenv
+
+
+load_dotenv(Path(__file__).with_name("agent.env"), override=False)
 
 
 DEFAULT_SYSTEM_PROMPT = """You are a careful personal assistant connected to the Personal AI MCP server.
