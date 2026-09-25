@@ -1,0 +1,15 @@
+[project]
+name = "personal-ai-mcp"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "mcp>=2.0",
+    "pydantic",
+    "aiosqlite",
+    "httpx",
+    "python-multipart",
+    "ddgs",
+    "cryptography",
+]

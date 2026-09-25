@@ -1,0 +1,19 @@
+# Replace with your VPS domain (or an IP-based :80 block for local testing).
+# Caddy issues/renews TLS automatically for a real domain.
+your-domain.example.com {
+    # MCP endpoint - what Alexa+ / Nemotron call
+    handle /mcp* {
+        reverse_proxy personal-ai-mcp:8000
+    }
+
+    # Device gateway + approvals - what node apps and you call
+    handle /devices* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /approvals* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /healthz {
+        reverse_proxy personal-ai-mcp:8001
+    }
+}

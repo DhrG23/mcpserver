@@ -1,0 +1,40 @@
+# For running on your local WiFi instead of a public VPS -- e.g. alongside
+# Ollama on your Arch box, with node apps on the same network.
+#
+# `tls internal` makes Caddy mint its own local CA and a cert for whatever
+# address you hit it on, so heartbeats/telemetry are still HTTPS (tokens
+# aren't sent in cleartext over the LAN) even with no public domain.
+#
+# One-time setup so devices don't show a cert warning / refuse the connection:
+#   - Linux node / your dev machine: `docker compose exec caddy caddy trust`
+#     installs Caddy's local root CA into the system trust store.
+#   - Android: pull the root CA and install it as a user certificate
+#     (Settings -> Security -> Encryption & credentials -> Install a certificate).
+#     Get it with: `docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt .`
+#   - iOS/macOS: AirDrop or transfer that same root.crt, install it, then
+#     enable full trust for it under Settings -> General -> About -> Certificate
+#     Trust Settings.
+#
+# If that's too much ceremony for a hackathon demo, plain HTTP on your own
+# home WiFi is a defensible shortcut -- just know the bearer tokens go over
+# the LAN in cleartext, so anyone else on that WiFi (a guest network, a
+# compromised IoT device, etc.) could sniff them. At-rest encryption of the
+# stored data is unaffected either way -- that protects the SQLite file
+# itself, independent of how requests got there.
+
+:8443 {
+    tls internal
+
+    handle /mcp* {
+        reverse_proxy personal-ai-mcp:8000
+    }
+    handle /devices* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /approvals* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /healthz {
+        reverse_proxy personal-ai-mcp:8001
+    }
+}
