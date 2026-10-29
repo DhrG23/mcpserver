@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+agent/agent.env
+*.db
+data/
+
+.DS_Store
+**/.DS_Store
+xcuserdata/
+*.xcuserstate
