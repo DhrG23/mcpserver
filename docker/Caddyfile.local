@@ -1,0 +1,40 @@
+# LAN setup. Caddy makes its own certificate (self-signed) for SERVER_HOST.
+# The Node app does NOT need Caddy's root CA: at sign-in it shows the certificate fingerprint and
+# you tap "Trust this server" (trust-on-first-use). Command-line tools can use curl -k / websocat -k.
+#
+# Use https://<SERVER_HOST>:8443 as the server address in the app.
+# Clients that connect by IP address (curl, the Node app) send no server name in the TLS handshake.
+# Behind Docker's port forwarding Caddy cannot guess the right certificate, so name it explicitly.
+{
+    default_sni {$SERVER_HOST}
+}
+
+https://{$SERVER_HOST}:8443 {
+    tls internal
+    handle /mcp* {
+        reverse_proxy personal-ai-mcp:8000
+    }
+    handle /chat/* {
+        reverse_proxy personal-ai-mcp:8001 {
+            stream_close_delay 5m
+        }
+    }
+    handle /auth/* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /account/* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /heartbeat {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /devices* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /approvals* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /healthz {
+        reverse_proxy personal-ai-mcp:8001
+    }
+}

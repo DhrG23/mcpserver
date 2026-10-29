@@ -1,0 +1,40 @@
+# Public VPS with a real domain (SERVER_DOMAIN in .env):
+#   cd docker && docker compose --env-file ../.env up -d --build
+services:
+  personal-ai-mcp:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    env_file:
+      - ../.env
+    environment:            # these win over .env, which is written for running outside Docker
+      BIND_HOST: 0.0.0.0
+      FORWARDED_ALLOW_IPS: "*"        # the container is only reachable from the Caddy container
+      PERSONAL_AI_DB_PATH: /data/personal_ai.db
+      FILES_ROOT: /data/files
+    volumes:
+      - personal_ai_data:/data
+    expose:
+      - "8000"   # MCP (Alexa+ / Nemotron / Ollama agent)
+      - "8001"   # gateway: /auth /heartbeat /devices /approvals /chat/ws
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    depends_on:
+      - personal-ai-mcp
+    environment:
+      SERVER_DOMAIN: ${SERVER_DOMAIN:-localhost}   # public mode: set a real domain in .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+volumes:
+  personal_ai_data:
+  caddy_data:
+  caddy_config:

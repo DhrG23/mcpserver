@@ -1,0 +1,1 @@
+"""Ollama agent loop for the Personal AI MCP server."""

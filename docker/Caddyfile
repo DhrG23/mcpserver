@@ -1,0 +1,30 @@
+# Public domain: Caddy gets and renews the TLS certificate automatically.
+# SERVER_DOMAIN comes from docker-compose (set it in .env).
+{$SERVER_DOMAIN} {
+    handle /mcp* {
+        reverse_proxy personal-ai-mcp:8000
+    }
+    handle /chat/* {
+        reverse_proxy personal-ai-mcp:8001 {
+            stream_close_delay 5m
+        }
+    }
+    handle /auth/* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /account/* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /heartbeat {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /devices* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /approvals* {
+        reverse_proxy personal-ai-mcp:8001
+    }
+    handle /healthz {
+        reverse_proxy personal-ai-mcp:8001
+    }
+}

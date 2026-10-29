@@ -1,0 +1,13 @@
+# LAN / home server (needs Docker Compose >= 2.24.4 for `!override`):
+#   cd docker &&  docker compose --env-file ../.env -f docker-compose.yml -f docker-compose.local.yml up -d --build
+# Needs SERVER_HOST in .env (the LAN IP or hostname your phone types, e.g. 192.168.1.20).
+services:
+  caddy:
+    environment:
+      SERVER_HOST: ${SERVER_HOST:?set SERVER_HOST in .env (LAN IP or hostname)}
+    volumes:
+      - ./Caddyfile.local:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    ports: !override
+      - "8443:8443"
